@@ -1,0 +1,53 @@
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+from timeit import timeit
+from random import randint
+
+def geraLista(tam):
+    lista = []
+    for i in range(tam):
+        n = randint(1,1*tam)
+        if n not in lista: lista.append(n)
+    return lista
+
+def geraListaDecrescente(tam):
+  lista = []
+  x = tam
+  for i in range(tam):
+    lista.append(x)
+    x -= 1
+  return lista
+
+def desenhaGrafico(x,y,z,xl = "Nº de Elementos", yl = "Tempo(s)"):
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111)
+    ax.plot(x,y, label = "Caso Médio")
+    plt.plot(x, z, label="Pior Caso")
+    ax.legend(bbox_to_anchor=(1, 1),bbox_transform=plt.gcf().transFigure)
+    plt.ylabel(yl)
+    plt.xlabel(xl)
+    fig.savefig('selectionSort.png')
+
+def selectionSort(lista):
+    for j in range(len(lista)-1,0,-1):
+        x = 0
+        for i in range(1,j+1):
+            if lista[i]>lista[x]:
+                x = i
+        lista[j],lista[x] = lista[x],lista[j]
+    return lista
+
+casoMedio= []
+piorCaso = []
+x = [1000,3000,6000,9000,12000,15000,18000,21000,24000]
+for i in x:
+    tempoMedio = timeit("selectionSort({})".format(geraLista(i)),setup="from __main__ import selectionSort",number=1)
+    for j in range(i):
+        n = tempoMedio
+        if n not in casoMedio: casoMedio.append(n)
+    tempoPior = timeit("selectionSort({})".format(geraListaDecrescente(i)),setup="from __main__ import selectionSort",number=1)
+    for k in range(i):
+        m = tempoPior
+        if m not in piorCaso: piorCaso.append(m)
+desenhaGrafico(x,casoMedio,piorCaso)
